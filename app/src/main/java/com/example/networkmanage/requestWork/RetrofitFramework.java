@@ -11,11 +11,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,18 +42,23 @@ public class RetrofitFramework implements NetworkRequestMethod{
 
     @Override
     public void getDownload(String tag, String baseUrl, String restUrl, Map<String, Object> createDownloadParam, Map<String, Object> paramMap, DownloadCallback downloadCallback) {
-        RetrofitHttpService retrofitRequest = createRetrofitRequest(baseUrl);
+
+        if(retrofitHttpService == null){
+            retrofitHttpService = createRetrofitRequest(baseUrl);
+        }
         if (createDownloadParam!=null&&!createDownloadParam.isEmpty()) {
             createDownloadParam.put("tag",tag);
         }
-        Call<ResponseBody> request = retrofitRequest.getDownload(createDownloadParam,restUrl, paramMap);
+        Call<ResponseBody> request = retrofitHttpService.getDownload(createDownloadParam,restUrl, paramMap);
         download(request,downloadCallback);
     }
 
     @Override
     public void getRequest(String tag, String baseUrl, String restUrl, Map<String, Object> paramMap, RequestCallback callback) {
-        RetrofitHttpService retrofitRequest = createRetrofitRequest(baseUrl);
-        Call<ResponseBody> request = retrofitRequest.getRequest(tag,restUrl,paramMap);
+        if(retrofitHttpService == null){
+            retrofitHttpService = createRetrofitRequest(baseUrl);
+        }
+        Call<ResponseBody> request = retrofitHttpService.getRequest(tag,restUrl,paramMap);
         request(request,callback);
     }
 
@@ -159,6 +169,11 @@ public class RetrofitFramework implements NetworkRequestMethod{
         String fileFolder = call.request().header("fileFolder");
         //存放文件名（带后缀）
         String fileName = call.request().header("fileName");
+        try {
+            fileName= URLDecoder.decode(fileName,"utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         //文件完整路径
         String fileSavePath = fileFolder+File.separator+fileName;
 
@@ -217,7 +232,7 @@ public class RetrofitFramework implements NetworkRequestMethod{
      * @param bytes         获取到的文件字节
      * @param localFileName 字节存到的文件路径：文件绝对路径
      */
-    private void byteToLocalFile(final byte[] bytes, final String localFileName) {
+    public static void byteToLocalFile(final byte[] bytes, final String localFileName) {
         FileOutputStream output = null;
         try {
             File storeFile = new File(localFileName);
@@ -252,14 +267,15 @@ public class RetrofitFramework implements NetworkRequestMethod{
     private static synchronized RetrofitHttpService createRetrofitRequest(String baseUrl) {
         if(retrofitHttpService == null){
             OkHttpClient client = new OkHttpClient.Builder()
-                    .readTimeout(8, TimeUnit.SECONDS)
-                    .writeTimeout(8, TimeUnit.SECONDS)
-                    .connectTimeout(5, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(30, TimeUnit.SECONDS)
+                    .connectTimeout(30, TimeUnit.SECONDS)
                     .build();
+            client.dispatcher().setMaxRequests(3);
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .client(client)
-                    .callbackExecutor(Executors.newFixedThreadPool(3))
+                    .callbackExecutor(Executors.newCachedThreadPool())
                     .build();
             retrofitHttpService = retrofit.create(RetrofitHttpService.class);
         }
