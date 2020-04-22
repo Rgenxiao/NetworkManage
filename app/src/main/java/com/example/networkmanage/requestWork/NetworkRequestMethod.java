@@ -43,10 +43,10 @@ public interface NetworkRequestMethod {
      * @param tag        request tag
      * @param baseUrl     request baseUrl
      * @param restUrl     request restUrl
-     * @param paramMap    request param
+     * @param jsonData    request param
      * @param callback    request callback
      * */
-    void postRequest(String tag,String baseUrl, String restUrl,Map<String,Object> paramMap,RequestCallback callback);
+    void postRequest(String tag,String baseUrl, String restUrl,String jsonData,RequestCallback callback);
     /**
      * method put
      * network request

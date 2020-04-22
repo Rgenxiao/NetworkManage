@@ -21,19 +21,30 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.HeaderMap;
+import retrofit2.http.POST;
 import retrofit2.http.QueryMap;
 import retrofit2.http.Streaming;
 import retrofit2.http.Url;
 
 public class RetrofitFramework implements NetworkRequestMethod{
+
+    private static RetrofitFramework retrofitFramework;
+    public static RetrofitFramework getInstance(){
+        if(retrofitFramework == null){
+            retrofitFramework = new RetrofitFramework();
+        }
+        return retrofitFramework;
+    }
 
     @Override
     public void postDownload(String tag, String baseUrl, String restUrl, Map<String, Object> createDownloadParam, Map<String, Object> paramMap, DownloadCallback callback) {
@@ -63,8 +74,13 @@ public class RetrofitFramework implements NetworkRequestMethod{
     }
 
     @Override
-    public void postRequest(String tag, String baseUrl, String restUrl, Map<String, Object> paramMap, RequestCallback callback) {
-
+    public void postRequest(String tag, String baseUrl, String restUrl, String jsonStr, RequestCallback callback) {
+        if(retrofitHttpService == null){
+            retrofitHttpService = createRetrofitRequest(baseUrl);
+        }
+        RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), jsonStr);
+        Call<ResponseBody> request = retrofitHttpService.postRequest(tag,restUrl,requestBody);
+        request(request,callback);
     }
 
     @Override
@@ -100,6 +116,7 @@ public class RetrofitFramework implements NetworkRequestMethod{
 
             @Override
             public void onFailure(Call<T> call, Throwable t) {
+
                 Log.d("","");
             }
         });
@@ -134,6 +151,8 @@ public class RetrofitFramework implements NetworkRequestMethod{
             @Override
             public void onFailure(Call<T> call, Throwable t) {
                 Log.d("","");
+                String tag = call.request().header("tag");
+                downloadCallback.onFail(tag,t.getMessage().toString());
             }
         });
     }
@@ -142,6 +161,8 @@ public class RetrofitFramework implements NetworkRequestMethod{
 
         @GET
         Call<ResponseBody> getRequest(@Header("tag") String tag, @Url String url, @QueryMap  Map<String, Object> params);
+        @POST
+        Call<ResponseBody> postRequest(@Header("tag") String tag, @Url String url, @Body RequestBody jsonData);
 
         @Streaming
         @GET
@@ -184,12 +205,13 @@ public class RetrofitFramework implements NetworkRequestMethod{
         //创建文件
         if (!file.exists()) {
             if (!file.getParentFile().exists())
-                file.getParentFile().mkdir();
+                file.getParentFile().mkdirs();
             try {
                 file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
                 downloadCallback.onFail(tag,"createNewFile IOException");
+                return ;
             }
         }
 
@@ -203,7 +225,7 @@ public class RetrofitFramework implements NetworkRequestMethod{
                 os.write(data, 0, len);
                 currentLength += len;
                 //计算当前下载进度
-                int progress = (int) (100 * currentLength / totalLength);
+                int progress = (int) (100 * (Float.parseFloat(currentLength+"") / totalLength));
                 downloadCallback.onProgress(tag,progress);
             }
             //下载完成，并返回保存的文件路径
