@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dist.onemap.sections.distMap.distOneMap.MapActivity;
+import dist.onemap.sections.userLogin.LoginActivity;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,7 +28,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        init();
+
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        intent.putExtra("baseUrl","http://192.168.1.40:8085/dgp-omms-server-web/rest/");
+        intent.putExtra("projectSearchUrl","http://192.168.1.95:8082/dgp-server-web/rest/project/v1/");
+        startActivity(intent);
+//        init();
     }
 
     private void init() {
@@ -35,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                intent.putExtra("isMapPage",true);
+                intent.putExtra("baseUrl","http://192.168.1.40:8085/dgp-omms-server-web/rest/");
+                intent.putExtra("projectSearchUrl","http://192.168.1.95:8082/dgp-server-web/rest/project/v1/");
                 intent.putExtra("userName","webapp");
                 intent.putExtra("password","pass");
                 startActivity(intent);
