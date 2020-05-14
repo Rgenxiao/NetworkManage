@@ -4,11 +4,11 @@ buildscript {
     repositories {
         google()
         jcenter()
-        
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.0'
-        
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.70"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -18,10 +18,20 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
+
+//        maven { url "file:/Users/mac/android_space/JX_IDE/onemap-aar" }
+        maven { url 'https://esri.bintray.com/arcgis'}
+        maven { url "https://xdata.dist.com.cn/appstore/onemap-aar/" }
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+ext{
+    kotlin_version = '1.3.70'
+    globalCompileSdkVersion = 29
+    globalBuildToolsVersion = '29.0.3'
+    globalMinSdkVersion = '19'
+    globalTargetSdkVersion = 29
 }

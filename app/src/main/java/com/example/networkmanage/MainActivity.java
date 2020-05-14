@@ -1,23 +1,24 @@
 package com.example.networkmanage;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.networkmanage.callback.DownloadCallback;
 import com.example.networkmanage.callback.RequestCallback;
-import com.example.networkmanage.requestWork.NetworkRequestMethod;
 import com.example.networkmanage.requestWork.RetrofitFramework;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import dist.onemap.sections.distMap.distOneMap.MapActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,6 +26,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        init();
+    }
+
+    private void init() {
+
+        findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                intent.putExtra("userName","webapp");
+                intent.putExtra("password","pass");
+                startActivity(intent);
+            }
+        });
         findViewById(R.id.startRequest).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
