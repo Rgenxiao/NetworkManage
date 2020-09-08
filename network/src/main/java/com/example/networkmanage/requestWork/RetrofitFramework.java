@@ -18,9 +18,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -160,13 +158,13 @@ public class RetrofitFramework implements NetworkRequestMethod{
     public interface RetrofitHttpService {
 
         @GET
-        Call<ResponseBody> getRequest(@Header("tag") String tag, @Url String url, @QueryMap  Map<String, Object> params);
+        Call<ResponseBody> getRequest(@Header("tag") String tag, @Url String url, @QueryMap Map<String, Object> params);
         @POST
         Call<ResponseBody> postRequest(@Header("tag") String tag, @Url String url, @Body RequestBody jsonData);
 
         @Streaming
         @GET
-        Call<ResponseBody> getDownload(@HeaderMap Map<String,Object> headerMap,@Url String url, @QueryMap Map<String, Object> params);
+        Call<ResponseBody> getDownload(@HeaderMap Map<String,Object> headerMap, @Url String url, @QueryMap Map<String, Object> params);
     }
 
     /**

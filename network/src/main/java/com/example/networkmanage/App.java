@@ -2,15 +2,8 @@ package com.example.networkmanage;
 
 import android.app.Application;
 
-import com.franmontiel.persistentcookiejar.PersistentCookieJar;
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
-import com.yanzhenjie.nohttp.InitializationConfig;
-import com.yanzhenjie.nohttp.NoHttp;
-
 public class App extends Application {
 
-    public static PersistentCookieJar cookieJar;
     @Override
     public void onCreate() {
         super.onCreate();
