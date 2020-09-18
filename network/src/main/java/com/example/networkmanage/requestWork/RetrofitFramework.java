@@ -14,10 +14,12 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -29,7 +31,10 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.HeaderMap;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
+import retrofit2.http.PartMap;
 import retrofit2.http.QueryMap;
 import retrofit2.http.Streaming;
 import retrofit2.http.Url;
@@ -82,6 +87,23 @@ public class RetrofitFramework implements NetworkRequestMethod{
     }
 
     @Override
+    public void postRequest(String tag, String baseUrl, String restUrl, Map<String, Object> fileMap, RequestCallback callback) {
+        if(retrofitHttpService == null){
+            retrofitHttpService = createRetrofitRequest(baseUrl);
+        }
+        Call<ResponseBody> request = retrofitHttpService.postFileRequest(tag,restUrl,fileMap);
+        request(request,callback);
+    }
+    @Override
+    public void postRequest(String tag, String baseUrl, String restUrl, MultipartBody multipartBody, RequestCallback callback) {
+        if(retrofitHttpService == null){
+            retrofitHttpService = createRetrofitRequest(baseUrl);
+        }
+        Call<ResponseBody> request = retrofitHttpService.postFileRequest(tag,restUrl,multipartBody);
+        request(request,callback);
+    }
+
+    @Override
     public void putRequest(String tag, String baseUrl, String restUrl, Map<String, Object> paramMap, RequestCallback callback) {
 
     }
@@ -114,8 +136,7 @@ public class RetrofitFramework implements NetworkRequestMethod{
 
             @Override
             public void onFailure(Call<T> call, Throwable t) {
-
-                Log.d("","");
+                callback.requestResult("onFailure",t.getMessage());
             }
         });
     }
@@ -156,7 +177,12 @@ public class RetrofitFramework implements NetworkRequestMethod{
     }
 
     public interface RetrofitHttpService {
-
+//        @Multipart
+        @POST
+        Call<ResponseBody> postFileRequest(@Header("tag") String tag, @Url String url,@QueryMap Map<String, Object> multipartParam);
+//        @Multipart
+        @POST
+        Call<ResponseBody> postFileRequest(@Header("tag") String tag, @Url String url,@Body MultipartBody multipartBody);
         @GET
         Call<ResponseBody> getRequest(@Header("tag") String tag, @Url String url, @QueryMap Map<String, Object> params);
         @POST

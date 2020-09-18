@@ -3,7 +3,11 @@ package com.example.networkmanage.requestWork;
 import com.example.networkmanage.callback.DownloadCallback;
 import com.example.networkmanage.callback.RequestCallback;
 
+import java.util.List;
 import java.util.Map;
+
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 public interface NetworkRequestMethod {
 
@@ -47,6 +51,25 @@ public interface NetworkRequestMethod {
      * @param callback    request callback
      * */
     void postRequest(String tag,String baseUrl, String restUrl,String jsonData,RequestCallback callback);
+    /**
+     * method post
+     * network request
+     * @param tag        request tag
+     * @param baseUrl     request baseUrl
+     * @param restUrl     request restUrl
+     * @param fileMap    request param
+     * @param callback    request callback
+     * */
+    void postRequest(String tag, String baseUrl, String restUrl, Map<String, Object> fileMap, RequestCallback callback);/**
+     * method post
+     * network request
+     * @param tag        request tag
+     * @param baseUrl     request baseUrl
+     * @param restUrl     request restUrl
+     * @param multipartBody    request param
+     * @param callback    request callback
+     * */
+    void postRequest(String tag, String baseUrl, String restUrl, MultipartBody multipartBody, RequestCallback callback);
     /**
      * method put
      * network request
